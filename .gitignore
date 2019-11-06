@@ -1,0 +1,7 @@
+*.zip
+*.code-workspace
+DataTables/
+src/styles/other/
+src/content-scripts/other/
+src/background/other/
+src/content-scripts/content2.js

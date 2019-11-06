@@ -1,0 +1,85 @@
+* {
+  box-sizing: border-box;
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding:0;
+  margin:0;
+}
+html {
+  min-width: 400px;
+  min-height: 600px;
+}
+body {
+  font: 90%/1.1 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  background-color: #FFFFFF;
+}
+h1, h2 {
+  font-size: 14pt;
+}
+#content {
+  margin: 5px;
+  background-color: #f9f9f9;
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  padding: 5px;
+  height: calc(100% - 10px);
+}
+.container {
+  overflow: auto;
+  height: calc(100% - 10px);
+}
+
+.card-deck .card {
+  min-width: 220px;
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+.hide {
+  display: none;
+}
+
+/* overrides for datatable styling */
+@media screen and (max-width: 767px) {
+  div.dataTables_wrapper div.dataTables_length, div.dataTables_wrapper div.dataTables_filter, div.dataTables_wrapper div.dataTables_info, div.dataTables_wrapper div.dataTables_paginate {
+      text-align: left;
+  }
+}
+
+table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
+  background-color: darkred;
+  color: white;
+}
+
+/* rules for Stock thumbnails */
+.gal {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  width: 50px;
+  height: 50px;
+  background-color: white;
+  opacity: 0.5;
+}
+
+#loader {
+  height: 12rem;
+}
+
+#loader .spinner-grow {
+  height: 10rem;
+  width: 10rem;
+}

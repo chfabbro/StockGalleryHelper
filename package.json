@@ -1,0 +1,15 @@
+{
+  "name": "stockgalleryhelper",
+  "version": "1.0.0",
+  "description": "Use to manage Adobe Stock galleries",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@git.corp.adobe.com:cfsmith/StockGalleryHelper.git"
+  },
+  "author": "cfsmith@adobe.com",
+  "license": "MIT"
+}

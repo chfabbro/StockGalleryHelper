@@ -1,0 +1,53 @@
+{
+    "name": "Adobe Stock Gallery Helper",
+    "version": "0.1.0",
+    "manifest_version": 2,
+    "description": "Use to manage Adobe Stock galleries",
+    "icons": {
+      "256": "images/stock-ext-icon-256.png",
+      "128": "images/stock-ext-icon-128.png",
+      "64": "images/stock-ext-icon-64.png",
+      "32": "images/stock-ext-icon-32.png",
+      "16": "images/stock-ext-icon-16.png"
+    },
+    "page_action": {
+      "default_title": "StockGalleryHelper",
+      "default_icon": "images/stock-ext-icon-64.png",
+      "disabled_title": "SIGN IN to Adobe Stock to use this extension",
+      "disabled_icon": {
+        "32": "images/stock-ext-icon-blocked-32.png",
+        "16": "images/stock-ext-icon-blocked-32.png"
+      }
+    },
+    "background": {
+      "scripts": [
+        "background/background.js",
+        "background/services.mjs"
+      ],
+      "persistent": false
+    },
+    "permissions": [
+      "activeTab",
+      "tabs",
+      "cookies",
+      "storage",
+      "https://primary.stock.stage.adobe.com/*",
+      "https://stock.adobe.com/",
+      "https://*.dev.loc/*",
+      "https://*.adobe.io/*"
+    ],
+    "content_security_policy": "script-src 'self' https://*.adobe.com https://*.adobe.io; object-src 'self'",
+    "content_scripts": [
+      {
+        "matches": [
+          "https://primary.stock.stage.adobe.com/*",
+          "https://stock.adobe.com/",
+          "https://contributors.dev.loc/*"
+        ],
+        "js": [
+          "content-scripts/content.js"
+        ]
+      }
+    ]
+  }
+  
