@@ -11,5 +11,13 @@
     "url": "git@git.corp.adobe.com:cfsmith/StockGalleryHelper.git"
   },
   "author": "cfsmith@adobe.com",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-import": "^2.18.2"
+  },
+  "dependencies": {
+    "babel-eslint": "^10.0.3"
+  }
 }

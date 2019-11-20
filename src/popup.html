@@ -23,11 +23,20 @@
     <div id="content">
         <!-- Header -->
         <div
-            class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-dark border-bottom box-shadow text-white navbar-dark relative">
+            class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-dark border-bottom box-shadow text-white navbar-dark relative" id="statusBanner">
             <h5 class="my-0 mr-md-auto font-weight-normal">Stock Gallery Helper</h5>
+            <div class="float-right d-flex">
+                <p class="mr-1 mt-1 mb-0 p-1 d-inline-flex">Gallery</p>
+                <div class="border border-light d-inline-flex p-1" id="statusBox">
+                    <p class="mt-1 mb-0 ml-1"><span class="text-light" id="statusGalleryName" data-id="none">None</span> <span id="statusGalleryCount" class="badge badge-warning">0</span></p>
+                </div>
+            </div>
         </div>
 
         <div class="container">
+            <!-- Alert placeholder -->
+            <div id="alertDiv"></div>
+
             <!-- Navbar -->
             <ul class="nav nav-tabs" id="galleryNav" role="tablist">
                 <li class="nav-item">
@@ -40,12 +49,12 @@
                 </li>
             </ul>
 
-            <div class="tab-content" id="galleryContent">
+            <div class="tab-content">
                 <!-- Manage tab-->
                 <div class="tab-pane fade show active" id="manage" role="tabpanel" aria-labelledby="manage-tab">
                     <p class="my-2 mx-4">
                         <button class="btn btn-sm btn-primary" id="get-galleries">Refresh</button>
-                        <label for="get-galleries">Load gallery list</label>
+                        <label for="get-galleries">Load list of galleries</label>
                     </p>
                     <table class="table table-hover" id="galleryTable">
                         <thead>
@@ -61,7 +70,25 @@
                 </div>
 
                 <!-- View tab-->
-                <div class="tab-pane fade show active" id="view" role="tabpanel" aria-labelledby="view-tab"></div>
+                <div class="tab-pane fade" id="view" role="tabpanel" aria-labelledby="view-tab">
+                    <p class="my-2 mx-4">
+                        <button class="btn btn-sm btn-primary" id="get-content">Refresh</button>
+                        <label for="get-content">Reload gallery contents</label>
+                    </p>
+                    <table class="table table-hover" id="contentTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" data-priority="1"></th>
+                                <th scope="col" data-priority="2">ID</th>
+                                <th scope="col">Title</th>
+                                <th scope="col" data-priority="3">Size</th>
+                                <th scope="col" data-priority="4">Downloads</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
 
             </div>
         </div>
@@ -105,7 +132,8 @@
     <div class="invisible">
         <form id="consentForm">
             <div class="form-group">
-                <button type="submit" class="btn btn-primary mt-2">Yes</button>
+                <label for="confirmSubsmit"><h6>Please confirm</h6></label>
+                <button type="submit" class="btn btn-primary mt-2" name="confirmSubsmit">Yes</button>
                 <button type="button" class="btn btn-secondary mt-2" data-dismiss="modal">Cancel</button>
             </div>
         </form>
@@ -117,6 +145,17 @@
             <div class="spinner-grow text-primary" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
+        </div>
+    </div>
+
+    <!-- Alert -->
+    <div class="invisible">
+        <div id="alert" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <h4 class="alert-heading">Error</h4>
+            <p>Something's gone wrong</p>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
     </div>
 </body>

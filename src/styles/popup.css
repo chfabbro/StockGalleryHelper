@@ -2,15 +2,10 @@
   box-sizing: border-box;
 }
 html, body {
-  width: 100%;
+  /* width: 100%; */
   height: 100%;
-  overflow: hidden;
   padding:0;
   margin:0;
-}
-html {
-  min-width: 400px;
-  min-height: 600px;
 }
 body {
   font: 90%/1.1 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -25,11 +20,15 @@ h1, h2 {
   border: 1px solid #cccccc;
   border-radius: 5px;
   padding: 5px;
-  height: calc(100% - 10px);
+  width: 100%;
+  /* height: calc(100% - 10px); */
 }
 .container {
   overflow: auto;
-  height: calc(100% - 10px);
+  width: 100%;
+  /* needed to size alert correctly */
+  position: relative;
+  /* height: calc(100% + 10px); */
 }
 
 .card-deck .card {
@@ -53,28 +52,29 @@ h1, h2 {
 }
 
 /* overrides for datatable styling */
+/*
 @media screen and (max-width: 767px) {
   div.dataTables_wrapper div.dataTables_length, div.dataTables_wrapper div.dataTables_filter, div.dataTables_wrapper div.dataTables_info, div.dataTables_wrapper div.dataTables_paginate {
       text-align: left;
   }
 }
+*/
 
-table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
+/* class applied when rows are selected */
+table.dataTable .rowSelect {
   background-color: darkred;
   color: white;
 }
-
-/* rules for Stock thumbnails */
-.gal {
-  position: absolute;
-  top: 5px;
-  left: 5px;
-  width: 50px;
-  height: 50px;
-  background-color: white;
-  opacity: 0.5;
+.dataTables_wrapper .dataTables_length {
+  float: left;
+  margin: 0.5rem 1rem 0 0;
 }
 
+/*
+.dataTables_wrapper, table.dataTable {
+  width: 100%;
+}
+*/
 #loader {
   height: 12rem;
 }
@@ -83,3 +83,21 @@ table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
   height: 10rem;
   width: 10rem;
 }
+
+#alertDiv {
+  position: absolute;
+  width: calc(100% - 30px);
+  margin: 0 auto;
+  z-index: 10;
+}
+
+.table-thumb {
+  max-width: 150px;
+  max-height: 100px;
+}
+
+#statusBox {
+  min-width: 20rem;
+  height: 2rem;
+}
+

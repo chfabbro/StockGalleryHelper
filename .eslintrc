@@ -1,4 +1,5 @@
 {
+  "parser": "babel-eslint",
   "extends": "airbnb-base",
 	"env": {
 		"browser": true,
@@ -9,5 +10,8 @@
   },
   "rules": {
     "no-console": "off"
+  },
+  "parserOptions": {
+    "ecmaVersion": 2019
   }
 }
