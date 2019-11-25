@@ -1,6 +1,16 @@
+/*
+ * Copyright 2019 Adobe. All rights reserved. This file is licensed to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
 const Popup = (() => {
   // add static constants
   const K = {
+    EVENTS: {
+      GALLERY: {
+        SET: 'gallery-set',
+        RESET: 'gallery-reset',
+      },
+    },
     STOCK_URL: {
       PROD: 'https://stock.adobe.com/',
       DEV: 'https://sandbox.stock.stage.adobe.com/',
@@ -57,7 +67,9 @@ const Popup = (() => {
         REFRESH: '#get-galleries',
         // sets listener delegate and target because link won't exist when turned on
         LINK: {
+          // delegated target
           DEL: '#manage',
+          // link target
           TARG: '#galleryTable tbody > tr > td a[rel="next"]',
         },
       },
@@ -120,10 +132,7 @@ const Popup = (() => {
         ],
       },
       TOKEN: 'access_token',
-      GALLERY: {
-        ID: 'galleryId',
-        NAME: 'galleryName',
-      },
+      GALLERY: 'selectedGallery',
       ENV: 'environment',
       POPUP: 'helper',
       COUNT: 'nb_results',
@@ -158,19 +167,6 @@ const Popup = (() => {
   const notify = (message) => {
     // sends message to background
     chrome.runtime.sendMessage(message);
-  };
-
-  // stores data in local storage
-  const store = (obj) => {
-    if (chrome.storage) {
-      console.log(obj);
-      chrome.storage.local.set(obj, () => {
-        const key = Object.keys(obj)[0];
-        chrome.storage.local.get(key, (item) => {
-          console.log('Stored %s with value %s', key, item[key]);
-        });
-      });
-    }
   };
 
   // gets data from local storage; returns async function

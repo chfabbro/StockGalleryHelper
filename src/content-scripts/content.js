@@ -1,5 +1,15 @@
+/*
+ * Copyright 2019 Adobe. All rights reserved. This file is licensed to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
 class Content {
   static CONSTANTS = {
+    EVENTS: {
+      GALLERY: {
+        SET: 'gallery-set',
+        RESET: 'gallery-reset',
+      },
+    },
     TARGET: {
       B: 'background',
       C: 'content',
@@ -25,10 +35,7 @@ class Content {
     // key values for local storage
     DATA: {
       TOKEN: 'access_token',
-      GALLERY: {
-        ID: 'galleryId',
-        NAME: 'galleryName',
-      },
+      GALLERY: 'selectedGallery',
       ENV: 'environment',
       POPUP: 'helper',
     },
@@ -50,8 +57,9 @@ class Content {
         TARGET_ID: 'div.lib-header-menu',
         CLASS_DEFAULT: 'gallery-banner',
         CLASS_ON: 'gallery-selected',
-        TEXT_ID: '#galStatus',
-        HTML: '<div class="gallery-banner"><div class="subheading">Gallery:<span id="galStatus">None</span></div></div>',
+        TEXT_ID: '#galStatusText',
+        MAIN: '#galStatus',
+        HTML: '<div id="galStatus" class="gallery-banner"><div class="subheading gallery-status" data-id="">Gallery:&nbsp;<span id="galStatusText">None</span></div></div>',
         STATE: {
           RESET: 0,
           SUCCESS: 1,
@@ -101,18 +109,27 @@ class Content {
 
 const {
   notify,
-  store,
   getToken,
   retrieve,
   CONSTANTS: K,
 } = Content;
 
+// session data stored while popup is open
+const tempData = {
+  gallery: {
+    id: '',
+    name: 'None',
+  },
+};
+
 async function doSetup() {
   const token = getToken();
   if (token !== '') {
     console.log('storing access token');
-    store({ [K.DATA.TOKEN]: token });
-    notify({ status: 'TOKEN_READY' });
+    notify({
+      status: 'TOKEN_READY',
+      data: token,
+    });
   } else {
     console.log('no token found!');
     notify({ status: 'TOKEN_PROBLEM' });
@@ -120,7 +137,7 @@ async function doSetup() {
 }
 
 async function getCurrentGallery() {
-  const id = await retrieve(K.DATA.GALLERY.ID);
+  const { id } = await retrieve(K.DATA.GALLERY);
   if (!id) {
     throw Error('No gallery selected in extension.');
   }
@@ -128,18 +145,29 @@ async function getCurrentGallery() {
 }
 
 // listen for incoming messages from extension
-chrome.runtime.onMessage.addListener((message, sender) => {
-  console.log(message, sender);
+chrome.runtime.onMessage.addListener((message) => {
+  console.log(message);
   const { status } = message;
+  const { data } = message || null;
   switch (status) {
     case 'BACKGROUND_READY':
     case 'POPUP_READY':
       break;
-    case K.UI.STATUS.STATE.SUCCESS:
+    case K.EVENTS.GALLERY.SET:
+      // store gallery name and id
+      tempData.gallery = {
+        id: data.id,
+        name: data.name,
+      };
       // notify listener to update banner
       document.dispatchEvent(new Event(status));
       break;
-    case K.UI.STATUS.STATE.RESET:
+    case K.EVENTS.GALLERY.RESET:
+      // unset gallery name
+      tempData.gallery = {
+        id: '',
+        name: 'None',
+      };
       document.dispatchEvent(new Event(status));
       break;
     case 'PING': // sends ping back to background
@@ -157,8 +185,6 @@ doSetup().then(() => {
 const $ = window.jQuery;
 $(document).ready(() => {
   console.log('jQuery ready in content');
-
-  const updateStatus = () => {};
 
   // opens modal
   // see https://www.webdesignerdepot.com/2012/10/creating-a-modal-window-with-html5-and-css3/
@@ -228,15 +254,31 @@ $(document).ready(() => {
     if (!$(TARGET).length) {
       window.requestAnimationFrame(insertStatusUi);
     } else {
-      // insert status element
-      const $banner = $(TARGET).append(HTML);
-      const { SUCCESS, RESET } = K.UI.STATUS.STATE;
-      $banner.on(`${SUCCESS} ${RESET}`, (e) => {
-        console.log('status event:', e);
-      });
+      // insert status element with default text
+      $(TARGET).append(HTML);
+      // notify background
+      notify({ status: 'CONTENT_STATUS_READY' });
     }
   };
 
+  // LISTENERS
+  // gallery status event
+  const { SET, RESET } = K.EVENTS.GALLERY;
+  $(document).on(`${SET} ${RESET}`, (e) => {
+    const {
+      TEXT_ID: NAME, MAIN: ID, CLASS_ON: ON,
+    } = K.UI.STATUS;
+    if (e.type === RESET) {
+      $(ID).removeClass(ON);
+    } else {
+      $(ID).addClass(ON);
+    }
+    // update text and id
+    $(NAME).text(tempData.gallery.name);
+    $(ID).attr('data-id', tempData.gallery.id);
+  });
+
+  // INIT
   insertThumbUi();
   insertStatusUi();
 });

@@ -1,3 +1,7 @@
+/*
+ * Copyright 2019 Adobe. All rights reserved. This file is licensed to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
 // eslint-disable-next-line import/extensions
 import Popup from './popup.js';
 
@@ -71,7 +75,7 @@ $(document).ready(() => {
     // set ui state
     const styleState = `STYLE_${state}`;
     [BANNER, BG, NAME, COUNT].forEach((ui) => {
-      $(ui.ID).removeClass(`${ui.STYLE_SUCESS} ${ui.STYLE_RESET}`);
+      $(ui.ID).removeClass(`${ui.STYLE_SUCCESS} ${ui.STYLE_RESET}`);
       $(ui.ID).addClass(`${ui[styleState]}`);
     });
     console.log(`Status set to STATE_${state}`);
@@ -128,6 +132,7 @@ $(document).ready(() => {
     };
     onApprovalNeeded(ui, () => {
       console.log('deleting gallery...');
+      // TODO: notify content tab
       // send request
       notify({
         action: K.ACTION.DEL,
@@ -179,10 +184,7 @@ $(document).ready(() => {
 
   // handles click of button and fetches data needed
   const onContentRefreshClick = (() => {
-    Promise.all([
-      retrieve(K.DATA.GALLERY.ID),
-      retrieve(K.DATA.GALLERY.NAME),
-    ]).then(([id, name]) => {
+    retrieve(K.DATA.GALLERY).then(({ id, name }) => {
       if (!id) {
         const warning = 'No gallery selected';
         console.warn(warning);
@@ -197,6 +199,15 @@ $(document).ready(() => {
     });
   });
 
+  const onGalleryRefresh = () => {
+    emptyModal();
+    toggleLoader(true);
+    // reset gallery selection and notify background
+    setStatus(K.UI.STATUS.STATE.RESET);
+    notify({ status: K.EVENTS.GALLERY.RESET });
+    notify({ action: K.ACTION.GET });
+  };
+
   // LISTENERS
   // -------------
   // gallery form submission
@@ -209,21 +220,14 @@ $(document).ready(() => {
   });
 
   // gallery refresh button
-  $(K.UI.GALLERY.REFRESH).on('click', () => {
-    emptyModal();
-    toggleLoader(true);
-    notify({ action: K.ACTION.GET });
-  });
+  $(K.UI.GALLERY.REFRESH).on('click', onGalleryRefresh);
 
-  // gallery link selector
-  /* disabled for now: will use table row selector
+  // listen for click on gallery contents row using delegate
+  /*
   $(K.UI.GALLERY.LINK.DEL).on('click', K.UI.GALLERY.LINK.TARG, (e) => {
     e.preventDefault();
-    // get link name and id
-    // TODO
     console.log(console.log(e.currentTarget));
     // switch to View tab
-    $(K.UI.CONTENTS.TAB).tab('show');
     onContentsRefresh();
   });
   */
@@ -238,8 +242,10 @@ $(document).ready(() => {
 
   // common table options
   const dtConfig = {
-    // scrollY: '100vh',
+    // scrollY: '95vh',
     // scrollCollapse: true,
+    deferRender: true,
+    // scroller: true,
     fixedHeader: true,
     autoWidth: false,
     responsive: true,
@@ -308,7 +314,7 @@ $(document).ready(() => {
         // connects to 'select' API
         extend: 'selected',
         text: 'Remove',
-        action: (e, ct) => {
+        action: (_e, ct) => {
           const row = ct.rows({ selected: true }).data()[0];
           // cast row array to object
           const data = arrayToObj(K.DATA.getContentResponse.MAP, row);
@@ -334,13 +340,12 @@ $(document).ready(() => {
     columns: [
       {
         name: 'name',
-        // render as hyperlink
-        // eslint-disable-next-line max-len
-        // render: ((name) => `<a class="bg-white" rel="next" href="#${name}" title="View gallery">${name}</a>`),
       },
       { name: 'nb_media', type: 'num' },
       {
         name: 'id',
+        // render as hyperlink
+        render: ((id) => `<a class="bg-white" rel="next" href="${K.STOCK_URL[Env]}collections/${id}" target="_blank" title="View gallery on Stock">${id}</a>`),
       },
     ],
     buttons: [
@@ -389,24 +394,33 @@ $(document).ready(() => {
     }
   });
 
-  // listen for messages from content and popup script
-  chrome.runtime.onMessage.addListener((message, sender) => {
-    console.log(message, sender);
+  // listen for deselect events
+  $gt.on('deselect', () => {
+    setStatus(K.UI.STATUS.STATE.RESET);
+    // refresh gallery list
+    notify({ status: K.EVENTS.GALLERY.RESET });
+  });
 
+  // listen for messages from content and popup script
+  // second argument is `sender` tab
+  chrome.runtime.onMessage.addListener((message) => {
+    console.log(message);
     // message is targeted to popup
     if (message.target && message.target === K.TARGET.P) {
       const { data, status } = message;
+      const {
+        GET, NEW, DEL, DIR, ADD, REM, ERROR,
+      } = K.RESPONSE;
       switch (status) {
-        case K.RESPONSE.GET:
+        case GET:
           // convert data to table array
           $gt.clear().rows.add(prepData(data, status)).draw();
           // dismiss modal if present
           toggleLoader(false);
           break;
-        case K.RESPONSE.NEW:
+        case NEW: {
           // dismiss modal
           toggleLoader(false);
-          // eslint-disable-next-line no-case-declarations
           const { title } = (data.gallery && data.gallery.title) ? data.gallery : { title: 'unknown' };
           showAlert(`New gallery ${title} created.`, K.UI.ALERT.SUCCESS);
           // show success message and refresh
@@ -415,17 +429,21 @@ $(document).ready(() => {
             notify({ action: K.ACTION.GET });
           }, 1500);
           break;
-        case K.RESPONSE.DIR: {
+        }
+        case DEL:
+          $gt.rows().deselect();
+          setStatus(K.UI.STATUS.STATE.RESET);
+          // refresh gallery list
+          onGalleryRefresh();
+          break;
+        case DIR: {
           $ct.clear()
             .rows.add(prepData(data, status))
             .draw()
             .columns.adjust();
           // get current gallery and update ui
           const count = data[K.DATA.COUNT] || 0;
-          Promise.all([
-            retrieve(K.DATA.GALLERY.ID),
-            retrieve(K.DATA.GALLERY.NAME),
-          ]).then(([id, name]) => {
+          retrieve(K.DATA.GALLERY).then(({ id, name }) => {
             setStatus(K.UI.STATUS.STATE.SUCCESS, id, name, count);
             // update status banner on Stock site (content script)
             notify({
@@ -437,17 +455,22 @@ $(document).ready(() => {
           toggleLoader(false);
           break;
         }
-        case K.RESPONSE.REM:
+        case ADD: {
+          const { files } = data;
+          let msg;
+          if (files.length) {
+            msg = `Image #${data.files[0].id} added.`;
+          } else {
+            msg = 'Image already in gallery.';
+          }
+          showAlert(msg, K.UI.ALERT.SUCCESS);
+          break;
+        }
+        case REM:
           $ct.rows().deselect();
           onContentRefreshClick();
           break;
-        case K.RESPONSE.DEL:
-          $gt.rows().deselect();
-          // TODO: Finish this and update local storage data
-          setStatus(K.UI.STATUS.STATE.RESET);
-          notify({ action: K.ACTION.GET });
-          break;
-        case K.RESPONSE.ERROR:
+        case ERROR:
           // dismiss modal
           toggleLoader(false);
           // show error
@@ -459,5 +482,7 @@ $(document).ready(() => {
       }
     }
   });
+  // get gallery list
+  onGalleryRefresh();
   init();
 });

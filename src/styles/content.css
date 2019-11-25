@@ -1,3 +1,7 @@
+/*
+ * Copyright 2019 Adobe. All rights reserved. This file is licensed to you under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+ */
+
 /* rules for Stock thumbnails to be injected into Stock site */
 .gal {
   position: absolute;
@@ -91,7 +95,7 @@
 }
 
 /* shows banner name and status on Library page */
-.gallery-banner {
+#galStatus.gallery-banner {
 	min-width: 15rem;
 	margin-right: 1rem;	
 	padding: 0.25rem;
@@ -99,10 +103,20 @@
 	text-align: right;
 }
 
-.library-header .gallery-banner .subheading {
-	margin-top: -0.25rem;
+#galStatus .gallery-status {
+  margin-top: -0.25rem;
+  padding: 0.5rem 0.25rem 0.25rem 0.25rem;
 }
 
-.gallery-selected {
-	background-color: #28a745;
+#galStatus.gallery-selected {
+  background-color: #28a745;
+  border: 1px solid #343a40;
+}
+
+#galStatus.gallery-selected .gallery-status {
+  color: #f5f5f5;
+}
+
+#galStatus.gallery-selected #galStatusText {
+  font-weight: bolder;
 }
