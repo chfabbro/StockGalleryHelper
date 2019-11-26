@@ -1,6 +1,6 @@
 {
     "name": "Adobe Stock Gallery Helper",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "manifest_version": 2,
     "description": "Use to manage Adobe Stock galleries",
     "icons": {
@@ -36,10 +36,10 @@
     "content_scripts": [
       {
         "matches": [
-          "https://primary.stock.stage.adobe.com/Library/*",
-          "https://sandbox.stock.stage.adobe.com/Library/*",
-          "https://stock.adobe.com/Library/*",
-          "https://contributors.dev.loc/Library/*"
+          "https://primary.stock.stage.adobe.com/*Library/*",
+          "https://sandbox.stock.stage.adobe.com/*Library/*",
+          "https://stock.adobe.com/*Library/*",
+          "https://contributors.dev.loc/*Library/*"
         ],
         "css": [ "styles/content.css"],
         "js": [

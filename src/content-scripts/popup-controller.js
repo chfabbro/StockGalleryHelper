@@ -167,18 +167,14 @@ $(document).ready(() => {
   // handles refresh of gallery content
   // could be triggered by button or link click
   const refreshContents = ((row) => {
-    retrieve(K.DATA.ENV).then((data) => {
-      Env = data;
-      console.log(`updating environment to ${data}`);
-      emptyModal();
-      toggleLoader(true);
-      return notify({
-        action: K.ACTION.DIR,
-        data: {
-          id: row.id,
-          name: row.name,
-        },
-      });
+    emptyModal();
+    toggleLoader(true);
+    return notify({
+      action: K.ACTION.DIR,
+      data: {
+        id: row.id,
+        name: row.name,
+      },
     });
   });
 
@@ -200,12 +196,16 @@ $(document).ready(() => {
   });
 
   const onGalleryRefresh = () => {
-    emptyModal();
-    toggleLoader(true);
-    // reset gallery selection and notify background
-    setStatus(K.UI.STATUS.STATE.RESET);
-    notify({ status: K.EVENTS.GALLERY.RESET });
-    notify({ action: K.ACTION.GET });
+    retrieve(K.DATA.ENV).then((data) => {
+      Env = data;
+      console.log(`updating environment to ${data}`);
+      emptyModal();
+      toggleLoader(true);
+      // reset gallery selection and notify background
+      setStatus(K.UI.STATUS.STATE.RESET);
+      notify({ status: K.EVENTS.GALLERY.RESET });
+      notify({ action: K.ACTION.GET });
+    });
   };
 
   // LISTENERS
