@@ -6,3 +6,7 @@ src/content-scripts/other/
 src/background/other/
 src/content-scripts/content2.js
 node_modules
+src/background/services_dev.mjs
+
+# include this one zip
+!stockgalleryhelper-*.zip
