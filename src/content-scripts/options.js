@@ -21,18 +21,35 @@ const {
 
 $(document).ready(() => {
   const K = {
+    EVENTS: {
+      OPTIONS: {
+        SET: 'options-set',
+        RESET: 'options-reset',
+      },
+    },
     DATA: {
       API_KEY: 'apiKey',
       URL: 'endpoint',
     },
   };
-  let formData = null;
+  const formData = {
+    [K.DATA.API_KEY]: {
+      name: K.DATA.API_KEY,
+      value: '',
+      id: '',
+    },
+    [K.DATA.URL]: {
+      name: K.DATA.URL,
+      value: '',
+      id: '',
+    },
+  };
 
-  const validateForm = (formVals) => {
-    const returnVals = formVals.map((entry) => {
+  const checkAndSaveData = (formVals) => {
+    const retVals = formVals.forEach((entry) => {
       const { name } = entry;
       let val;
-      if (name === 'endpoint') {
+      if (name === K.DATA.URL) {
         val = new URL(`https://${entry.value}`);
       } else {
         const apiKeyTest = /^[a-zA-Z0-9]+$/;
@@ -42,25 +59,26 @@ $(document).ready(() => {
           val = entry.value;
         }
       }
-      return {
-        [entry.name]: val,
-      };
+      // store data locally
+      formData[name].value = val;
     });
-    return returnVals;
+    return retVals;
   };
 
   const onFormSubmit = ((e) => {
     e.preventDefault();
     const $form = $(e.currentTarget);
     try {
-      formData = validateForm($form.serializeArray());
+      // validate data and save locally
+      checkAndSaveData($form.serializeArray());
+      // update in chrome storage
+      // START HERE notify()
     } catch (err) {
       console.error(err);
     }
     // TODO: use notify to store send values to bg script
     // TODO: at startup, check if values already exist and use retrieve
   });
-
   // check if values exist
   Promise.all([
     retrieve(K.DATA.API_KEY),
