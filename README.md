@@ -1,7 +1,9 @@
 # Stock Gallery Helper
 Extension for Chrome to manage Stock galleries
 
-This is sample code is a work in progress. 
+**NOTE: Do not use this version. Please use the version found here:**
+
+https://github.com/adobe/stock-api-samples/tree/master/StockGalleryHelper
 
 ## Usage
 
